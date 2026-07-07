@@ -21,6 +21,8 @@ export const SupportedProvider = {
   OpenRouter: 'openrouter',
   ZAI: 'zai',
   Ollama: 'ollama',
+  /** Generic OpenAI-compatible endpoints (e.g. Kimi, StepFun, custom gateways) */
+  OpenAICompatible: 'openai-compatible',
 } as const;
 
 export type SupportedProvider = (typeof SupportedProvider)[keyof typeof SupportedProvider];
