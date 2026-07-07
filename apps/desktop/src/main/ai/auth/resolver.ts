@@ -332,6 +332,7 @@ const BUILTIN_TO_SUPPORTED: Record<string, SupportedProvider> = {
   openrouter: 'openrouter',
   zai: 'zai',
   ollama: 'ollama',
+  'openai-compatible': 'openai-compatible',
 };
 
 /**
@@ -391,17 +392,27 @@ export async function resolveAuthFromQueue(
     );
 
     if (!modelSpec) {
-      // No cross-provider equivalent found. Only proceed if the model is
-      // native to this provider's API (detected via model ID prefix).
-      // Ollama is a special case: it runs arbitrary user-installed models with
-      // no predictable prefix (e.g., 'llama3.1:8b', 'mistral:7b', 'phi3:mini').
-      // When the account IS Ollama, allow any unrecognized model through since
-      // the user explicitly configured it. When the account is NOT Ollama, skip
-      // if the model can't be identified as native.
-      const nativeProvider = detectProviderFromModel(requestedModel);
-      if (nativeProvider !== supportedProvider && supportedProvider !== 'ollama') continue;
-      // If nativeProvider is defined but doesn't match Ollama, skip (e.g., 'claude-*' on Ollama)
-      if (supportedProvider === 'ollama' && nativeProvider && nativeProvider !== 'ollama') continue;
+      // No cross-provider equivalent found. Custom third-party endpoints serve
+      // their own model IDs that aren't in the equivalence table (e.g.
+      // 'MiniMax-M3', 'kimi-for-coding', 'step-3.7-flash'). When the account
+      // targets a custom endpoint — either an explicit baseUrl (an
+      // Anthropic-compatible gateway like MiniMax) or the generic
+      // openai-compatible provider — trust the user's configured model and pass
+      // it through instead of skipping the account.
+      const isCustomEndpoint =
+        !!account.baseUrl || account.provider === 'openai-compatible';
+      if (!isCustomEndpoint) {
+        // Only proceed if the model is native to this provider's API (detected
+        // via model ID prefix). Ollama is a special case: it runs arbitrary
+        // user-installed models with no predictable prefix (e.g., 'llama3.1:8b',
+        // 'mistral:7b', 'phi3:mini'). When the account IS Ollama, allow any
+        // unrecognized model through since the user explicitly configured it.
+        // When the account is NOT Ollama, skip if the model can't be identified.
+        const nativeProvider = detectProviderFromModel(requestedModel);
+        if (nativeProvider !== supportedProvider && supportedProvider !== 'ollama') continue;
+        // If nativeProvider is defined but doesn't match Ollama, skip (e.g., 'claude-*' on Ollama)
+        if (supportedProvider === 'ollama' && nativeProvider && nativeProvider !== 'ollama') continue;
+      }
     }
 
     const resolvedModelId = modelSpec?.modelId ?? requestedModel;

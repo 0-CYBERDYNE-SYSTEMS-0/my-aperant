@@ -141,6 +141,18 @@ function createProviderInstance(config: ProviderConfig) {
         headers,
       });
 
+    case SupportedProvider.OpenAICompatible: {
+      // Generic OpenAI-compatible endpoints (Kimi, StepFun, custom gateways).
+      // The account's baseURL must point at the OpenAI-style root that serves
+      // `/chat/completions` (e.g. 'https://api.kimi.com/coding/v1').
+      return createOpenAICompatible({
+        name: 'openai-compatible',
+        apiKey: apiKey ?? '',
+        baseURL: baseURL ?? '',
+        headers,
+      });
+    }
+
     case SupportedProvider.Ollama: {
       // Account settings store the base Ollama URL (e.g., 'http://localhost:11434')
       // but the OpenAI-compatible SDK needs the /v1 path appended.
