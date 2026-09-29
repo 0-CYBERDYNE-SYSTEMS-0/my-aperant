@@ -16,6 +16,15 @@ updates:
       ai-sdk:
         patterns:
           - "@ai-sdk/*"
+      # react and react-dom must have the exact same version; dependabot
+      # bumping one alone triggers React's hard version-mismatch error in
+      # every component test. Keep the pair (plus their @types) in lockstep.
+      react-lockstep:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
     labels:
       - dependencies
       - javascript
