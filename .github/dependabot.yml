@@ -8,6 +8,14 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      # @ai-sdk/* packages share @ai-sdk/provider(-utils) type versions;
+      # bumping one alone splits provider versions between top-level and
+      # nested installs and breaks the TypeScript build (EmbeddingModel
+      # v2/v4 union mismatch in embedding-service.ts). Bump them together.
+      ai-sdk:
+        patterns:
+          - "@ai-sdk/*"
     labels:
       - dependencies
       - javascript
