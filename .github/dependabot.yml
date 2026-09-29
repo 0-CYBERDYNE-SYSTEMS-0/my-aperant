@@ -1,8 +1,10 @@
 version: 2
 updates:
-  # npm dependencies
+  # npm dependencies (workspaces monorepo: root package-lock.json owns
+  # apps/* dependency resolution, so dependabot must run at the repo root
+  # or its bumps desync the lockfile and `npm ci` fails in CI)
   - package-ecosystem: npm
-    directory: /apps/desktop
+    directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
