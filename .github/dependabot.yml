@@ -9,13 +9,17 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
-      # @ai-sdk/* packages share @ai-sdk/provider(-utils) type versions;
-      # bumping one alone splits provider versions between top-level and
-      # nested installs and breaks the TypeScript build (EmbeddingModel
-      # v2/v4 union mismatch in embedding-service.ts). Bump them together.
+      # The adapters and core `ai` package share provider-model types, but
+      # major lines are not API-compatible: the current app uses ai@6/provider
+      # v3, while the provider-major updates require ai@7/provider v4. Keep
+      # patch/minor updates grouped; defer majors to an explicit migration.
       ai-sdk:
         patterns:
+          - "ai"
           - "@ai-sdk/*"
+        update-types:
+          - minor
+          - patch
       # react and react-dom must have the exact same version; dependabot
       # bumping one alone triggers React's hard version-mismatch error in
       # every component test. Keep the pair (plus their @types) in lockstep.
@@ -25,6 +29,15 @@ updates:
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
+    # The SDK major line requires a coordinated source migration; do not
+    # emit unsupported adapter/core major bumps as individual PRs.
+    ignore:
+      - dependency-name: "ai"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "@ai-sdk/*"
+        update-types:
+          - "version-update:semver-major"
     labels:
       - dependencies
       - javascript
