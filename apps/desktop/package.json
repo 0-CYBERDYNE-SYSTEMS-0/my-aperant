@@ -87,7 +87,7 @@
     "@sentry/electron": "^7.10.0",
     "@tailwindcss/typography": "^0.5.20",
     "@tanstack/react-virtual": "^3.13.22",
-    "@tavily/core": "^0.7.2",
+    "@tavily/core": "^1.0.0",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/addon-serialize": "^0.14.0",
     "@xterm/addon-web-links": "^0.12.0",
